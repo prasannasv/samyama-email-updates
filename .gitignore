@@ -1,0 +1,8 @@
+build
+.gradle
+contents.tsv
+*.ipr
+*.iml
+*.iws
+*.iml
+src/main/resources/client_secret.json
