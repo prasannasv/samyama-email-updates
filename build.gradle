@@ -17,5 +17,6 @@ dependencies {
     compile 'com.google.apis:google-api-services-gmail:v1-rev76-1.23.0'
     
     compile 'org.apache.commons:commons-csv:1.5'
+    compile group: 'com.google.guava', name: 'guava', version: '23.6-jre'
 }
 

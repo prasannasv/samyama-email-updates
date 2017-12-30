@@ -16,6 +16,8 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.*;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Thread;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -25,6 +27,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Quickstart {
     /** Application name. */
@@ -106,18 +109,22 @@ public class Quickstart {
 
         String user = "me";
 
-        /*// Get the label ids
-        ListLabelsResponse labelsResponse = service.users().labels().list(user).execute();
-        for (Label label : labelsResponse.getLabels()) {
-            System.out.println(label.getId() + ", " + label.getName());
-        }*/
+        // Get the label ids
+        final BiMap<String, String> labelIdsAndNames = HashBiMap.create();
+        final ListLabelsResponse labelsResponse = service.users().labels().list(user).execute();
+        for (final Label label : labelsResponse.getLabels()) {
+            labelIdsAndNames.put(label.getId(), label.getName());
+        }
+        final Map<String, String> labelNamesToIdsMap = labelIdsAndNames.inverse();
 
         // Print the messages under specific labels
         final CSVPrinter printer = CSVFormat.TDF.printer();
-        final List<String> filterLabels = Arrays.asList("Label_57", "Label_62", "Label_56");
+        final List<String> filterLabels = Arrays.asList("Samyama USA 2018/Pre-requisites/Completion Status",
+                "Samyama USA 2018/Pre-Samyama/Questionnaire Updates",
+                "Samyama USA 2018/Practice Updates");
         for (final String filterLabel : filterLabels) {
             final ListThreadsResponse threadsResponse =
-                    service.users().threads().list(user).setLabelIds(Arrays.asList(filterLabel)).execute();
+                    service.users().threads().list(user).setLabelIds(Arrays.asList(labelNamesToIdsMap.get(filterLabel))).execute();
             final List<Thread> threads = threadsResponse.getThreads();
 
             for (final Thread thread : threads) {
@@ -146,8 +153,8 @@ public class Quickstart {
                         }
                         final String body = new String(Base64.decodeBase64(encodedBody), StandardCharsets.UTF_8);
 
-                        // threadId, messageId, payload.headers.Date, payload.headers.From, payload.headers.Subject, payload.body.data
-                        printer.printRecord(thread.getId(), message.getId(), date, from, subject, body);
+                        // label, threadId, messageId, payload.headers.Date, payload.headers.From, payload.headers.Subject, payload.body.data
+                        printer.printRecord(filterLabel, thread.getId(), message.getId(), date, from, subject, body);
                     }
                 }
             }
