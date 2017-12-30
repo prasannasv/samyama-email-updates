@@ -119,7 +119,9 @@ public class EmailExplorer {
 
         // Print the messages under specific labels
         final CSVPrinter printer = CSVFormat.TDF.printer();
-        final List<String> filterLabels = Arrays.asList("Samyama USA 2018/Pre-requisites/Completion Status",
+        final List<String> filterLabels = Arrays.asList(
+                "Samyama USA 2018/Pre-requisites/Hatha Program Verifications",
+                "Samyama USA 2018/Pre-requisites/Completion Status",
                 "Samyama USA 2018/Pre-Samyama/Questionnaire Updates",
                 "Samyama USA 2018/Practice Updates");
         for (final String filterLabel : filterLabels) {
@@ -133,6 +135,7 @@ public class EmailExplorer {
                     if (message.getPayload() != null && message.getPayload().getParts() != null) {
                         String date = "";
                         String from = "";
+                        String replyTo = "";
                         String subject = "";
                         for (final MessagePartHeader header : message.getPayload().getHeaders()) {
                             switch (header.getName()) {
@@ -145,16 +148,22 @@ public class EmailExplorer {
                                 case "From":
                                     from = header.getValue();
                                     break;
+                                case "Return-Path":
+                                    replyTo = header.getValue().replace("<", "").replace(">", "");
+                                    break;
                             }
                         }
                         final String encodedBody = message.getPayload().getParts().get(0).getBody().getData();
                         if (encodedBody == null || encodedBody.length() == 0) {
                             continue;
                         }
+                        if (from.contains("samyama.usa@ishafoundation.org")) {
+                            continue;
+                        }
                         final String body = new String(Base64.decodeBase64(encodedBody), StandardCharsets.UTF_8);
 
-                        // label, threadId, messageId, payload.headers.Date, payload.headers.From, payload.headers.Subject, payload.body.data
-                        printer.printRecord(filterLabel, thread.getId(), message.getId(), date, from, subject, body);
+                        // label, threadId, messageId, payload.headers.Date, payload.headers.From, payload.headers.ReplyTo, payload.headers.Subject, payload.body.data
+                        printer.printRecord(filterLabel, thread.getId(), message.getId(), date, from, replyTo, subject, body);
                     }
                 }
             }

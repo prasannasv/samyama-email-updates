@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'idea'
 
-mainClassName = 'Quickstart'
+mainClassName = 'EmailExplorer'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 version = '1.0'
