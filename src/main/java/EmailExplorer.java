@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class Quickstart {
+public class EmailExplorer {
     /** Application name. */
     private static final String APPLICATION_NAME =
         "Gmail API Java Quickstart";
@@ -74,7 +74,7 @@ public class Quickstart {
     public static Credential authorize() throws IOException {
         // Load client secrets.
         InputStream in =
-            Quickstart.class.getResourceAsStream("/client_secret.json");
+                EmailExplorer.class.getResourceAsStream("/client_secret.json");
         GoogleClientSecrets clientSecrets =
             GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
